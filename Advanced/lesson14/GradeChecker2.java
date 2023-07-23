@@ -88,22 +88,34 @@ public class GradeChecker2 {
                 value++;
             }
         }
-        return value / 14 * 100;
+        return value;
     }
 
     void scoreCalc(HashMap<Integer, Double> exam, HashMap<Integer, Integer> assign, HashMap<Integer, Integer> mini,
             Integer i) throws IOException {
-        Double score = (70 / 100) * exam.get(i) + (25 / 60) * assign.get(i) + 5 * mini.get(i);
-        if (90 <= score) {
-            System.out.printf("%d,%f,%s,%d,%d,秀%n", i, score, exam.get(i), assign.get(i), mini.get(i));
-        } else if ((80 <= score) && (score < 90)) {
-            System.out.printf("%d,%f,%s,%d,%d,優%n", i, score, exam.get(i), assign.get(i), mini.get(i));
-        } else if ((70 <= score) && (score < 80)) {
-            System.out.printf("%d,%f,%s,%d,%d,良%n", i, score, exam.get(i), assign.get(i), mini.get(i));
-        } else if ((60 <= score) && (score < 70)) {
-            System.out.printf("%d,%f,%s,%d,%d,可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+        Double score = 0.0;
+        if (assign.get(i) == null) {
+            score = (70.0 / 100.0) * exam.get(i) + 5.0 * (double) (mini.get(i)) / 14.0;
+        } else if (mini.get(i) == null) {
+            score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * (double) (assign.get(i));
+        } else if (assign.get(i) == null || mini.get(i) == null) {
+            score = (70.0 / 100.0) * exam.get(i);
         } else {
-            System.out.printf("%d,%f,%s,%d,%d,不可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * (double) (assign.get(i))
+                    + 5.0 * (double) (mini.get(i)) / 14.0;
+        }
+
+        score = Math.ceil(score);
+        if (90 <= score) {
+            System.out.printf("%s,%s,%s,%s,%d,秀%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+        } else if ((80 <= score) && (score < 90)) {
+            System.out.printf("%s,%s,%s,%s,%d,優%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+        } else if ((70 <= score) && (score < 80)) {
+            System.out.printf("%s,%s,%s,%s,%d,良%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+        } else if ((60 <= score) && (score < 70)) {
+            System.out.printf("%s,%s,%s,%s,%d,可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+        } else {
+            System.out.printf("%s,%s,%s,%s,%d,不可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
         }
     }
 
