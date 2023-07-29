@@ -1,3 +1,4 @@
+
 // import
 import java.io.*;
 import java.util.*;
@@ -31,13 +32,13 @@ public class GradeChecker2 {
             if (key > max) {
                 max = key;
             }
-            //System.out.printf("%d,%.3f%n", key, value);
+            // System.out.printf("%d,%.3f%n", key, value);
         }
         for (Integer i = 1; i <= max; i++) {
             if (Objects.equals(student.get(i), null)) {
                 student.put(i, 0.0);
             }
-            //System.out.printf("%d,%.3f%n", i, student.get(i));
+            // System.out.printf("%d,%.3f%n", i, student.get(i));
         }
         in.close();
     }
@@ -100,24 +101,27 @@ public class GradeChecker2 {
 
     void scoreCalc(HashMap<Integer, Double> exam, HashMap<Integer, Integer> assign, HashMap<Integer, Double> mini,
             Integer i) throws IOException {
-        Double score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * Double.valueOf(assign.get(i)) + 5.0 * (mini.get(i) / 14.0);
-        //System.out.printf("%d,%.0f%n", i, score);
-        score = Math.ceil(score);
-        if (90 <= score) {
-            System.out.printf("%d,%.0f,%.3f,%s,%.0f,秀%n", i, score, exam.get(i), assign.get(i),mini.get(i));
+        Double score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * Double.valueOf(assign.get(i))
+                + 5.0 * (mini.get(i) / 14.0);
+        // System.out.printf("%d,%.0f%n", i, score);
+        score = Math.ceil(score); // 小数点以下切り上げ
+        if (Objects.equals(exam.get(i), 0.0)) {
+            System.out.printf("%d,%2.0f,,%s,%.0f,K%n", i, score, assign.get(i), mini.get(i));
+        } else if (90 <= score) {
+            System.out.printf("%d,%2.0f,%.3f,%s,%.0f,秀%n", i, score, exam.get(i), assign.get(i), mini.get(i));
         } else if ((80 <= score) && (score < 90)) {
-            System.out.printf("%d,%.0f,%.3f,%s,%.0f,優%n", i, score, exam.get(i), assign.get(i),
+            System.out.printf("%d,%2.0f,%.3f,%s,%.0f,優%n", i, score, exam.get(i), assign.get(i),
                     mini.get(i));
         } else if ((70 <= score) && (score < 80)) {
-            System.out.printf("%d,%.0f,%.3f,%s,%.0f,良%n", i, score, exam.get(i), assign.get(i),
+            System.out.printf("%d,%2.0f,%.3f,%s,%.0f,良%n", i, score, exam.get(i), assign.get(i),
                     mini.get(i));
         } else if ((60 <= score) && (score < 70)) {
-            System.out.printf("%d,%.0f,%.3f,%s,%.0f,可%n", i, score, exam.get(i), assign.get(i),
+            System.out.printf("%d,%2.0f,%.3f,%s,%.0f,可%n", i, score, exam.get(i), assign.get(i),
                     mini.get(i));
         } else {
-            System.out.printf("%d,%.0f,%.3f,%s,%.0f,不可%n", i, score, exam.get(i),assign.get(i), mini.get(i));
+            System.out.printf("%d,%2.0f,%.3f,%s,%.0f,不可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
         }
-        
+
     }
 
     public static void main(String[] args) throws IOException {
