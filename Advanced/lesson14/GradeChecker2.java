@@ -1,4 +1,3 @@
-
 // import
 import java.io.*;
 import java.util.*;
@@ -7,14 +6,14 @@ public class GradeChecker2 {
     void run(String[] args) throws IOException {
         HashMap<Integer, Double> exam = new HashMap<>();
         HashMap<Integer, Integer> assign = new HashMap<>();
-        HashMap<Integer, Integer> mini = new HashMap<>();
+        HashMap<Integer, Double> mini = new HashMap<>();
         File examFile = new File(args[0]); // File型の実体を作成する
         File assignFile = new File(args[1]);
         File miniFile = new File(args[2]);
         this.examReader(exam, examFile);
         this.assignReader(assign, assignFile);
         this.miniReader(mini, miniFile);
-        for (Integer i = 1; i < exam.size(); i++) {
+        for (Integer i = 1; i <= exam.size(); i++) {
             this.scoreCalc(exam, assign, mini, i);
         }
     }
@@ -23,37 +22,40 @@ public class GradeChecker2 {
     void examReader(HashMap<Integer, Double> student, File file) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(file));
         String line;
+        Integer max = 0;
         while ((line = in.readLine()) != null) {
             String[] array = line.split(",");
             Integer key = Integer.valueOf(array[0]);
-            Double value = this.calc(array[1]);
+            Double value = Double.valueOf(array[1]);
             student.put(key, value);
+            if (key > max) {
+                max = key;
+            }
+            //System.out.printf("%d,%.3f%n", key, value);
+        }
+        for (Integer i = 1; i <= max; i++) {
+            if (Objects.equals(student.get(i), null)) {
+                student.put(i, 0.0);
+            }
+            //System.out.printf("%d,%.3f%n", i, student.get(i));
         }
         in.close();
     }
 
-    Double calc(String value) throws IOException { // 点数を四捨五入する
-        Double score = Double.valueOf(value) * 1000;
-        Long afterScore = Math.round(Double.valueOf(score));
-        Double ans = (double) afterScore / 1000;
-        return ans;
-    }
-
-    // assignments.csv
+    // assignments.csv(ok)
     void assignReader(HashMap<Integer, Integer> assign, File file) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(file));
         String line;
         while ((line = in.readLine()) != null) {
             String[] array = line.split(",");
             Integer key = Integer.valueOf(array[0]);
-            Integer value = this.assignCalc(array); // valueを計算する
+            Integer value = this.assignCalc(array);
             assign.put(key, value);
-            // System.out.printf("%d,%s%n", key, value);
         }
         in.close();
     }
 
-    Integer assignCalc(String[] array) { // assignReader:valueの計算
+    Integer assignCalc(String[] array) {
         Integer value = 0;
         for (Integer i = 1; i < array.length; i++) {
             if (Objects.equals(array[i], "")) {
@@ -65,58 +67,57 @@ public class GradeChecker2 {
         return value;
     }
 
-    // miniexam.csv
-    void miniReader(HashMap<Integer, Integer> mini, File file) throws IOException {
+    // miniexam.csv(ok)
+    void miniReader(HashMap<Integer, Double> mini, File file) throws IOException {
         BufferedReader in = new BufferedReader(new FileReader(file));
         String line;
         while ((line = in.readLine()) != null) {
             String[] array = line.split(",");
             Integer key = Integer.valueOf(array[0]);
-            Integer value = this.miniCalc(array); // valueを計算する
+            Double value = this.miniCalc(array); // valueを計算する
             mini.put(key, value);
-            // System.out.printf("%d,%s%n", key, value);
+        }
+        for (Integer i = 1; i < mini.size(); i++) {
+            if (Objects.equals(mini.get(i), null)) {
+                mini.put(i, 0.0);
+            }
+            // System.out.printf("%d,%.1f%n", i, mini.get(i)/14.0);
         }
         in.close();
     }
 
-    Integer miniCalc(String[] array) {
-        Integer value = 0;
+    Double miniCalc(String[] array) {
+        Double value = 0.0;
         for (Integer i = 1; i < array.length; i++) {
             if (Objects.equals(array[i], "")) {
-                value += 0;
+                value += 0.0;
             } else {
-                value++;
+                value += 1.0;
             }
         }
         return value;
     }
 
-    void scoreCalc(HashMap<Integer, Double> exam, HashMap<Integer, Integer> assign, HashMap<Integer, Integer> mini,
+    void scoreCalc(HashMap<Integer, Double> exam, HashMap<Integer, Integer> assign, HashMap<Integer, Double> mini,
             Integer i) throws IOException {
-        Double score = 0.0;
-        if (assign.get(i) == null) {
-            score = (70.0 / 100.0) * exam.get(i) + 5.0 * (double) (mini.get(i)) / 14.0;
-        } else if (mini.get(i) == null) {
-            score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * (double) (assign.get(i));
-        } else if (assign.get(i) == null || mini.get(i) == null) {
-            score = (70.0 / 100.0) * exam.get(i);
-        } else {
-            score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * (double) (assign.get(i))
-                    + 5.0 * (double) (mini.get(i)) / 14.0;
-        }
-
+        Double score = (70.0 / 100.0) * exam.get(i) + (25.0 / 60.0) * Double.valueOf(assign.get(i)) + 5.0 * (mini.get(i) / 14.0);
+        //System.out.printf("%d,%.0f%n", i, score);
         score = Math.ceil(score);
         if (90 <= score) {
-            System.out.printf("%s,%s,%s,%s,%d,秀%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            System.out.printf("%d,%.0f,%.3f,%s,%.0f,秀%n", i, score, exam.get(i), assign.get(i),mini.get(i));
         } else if ((80 <= score) && (score < 90)) {
-            System.out.printf("%s,%s,%s,%s,%d,優%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            System.out.printf("%d,%.0f,%.3f,%s,%.0f,優%n", i, score, exam.get(i), assign.get(i),
+                    mini.get(i));
         } else if ((70 <= score) && (score < 80)) {
-            System.out.printf("%s,%s,%s,%s,%d,良%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            System.out.printf("%d,%.0f,%.3f,%s,%.0f,良%n", i, score, exam.get(i), assign.get(i),
+                    mini.get(i));
         } else if ((60 <= score) && (score < 70)) {
-            System.out.printf("%s,%s,%s,%s,%d,可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            System.out.printf("%d,%.0f,%.3f,%s,%.0f,可%n", i, score, exam.get(i), assign.get(i),
+                    mini.get(i));
         } else {
-            System.out.printf("%s,%s,%s,%s,%d,不可%n", i, score, exam.get(i), assign.get(i), mini.get(i));
+            System.out.printf("%d,%.0f,%.3f,%s,%.0f,不可%n", i, score, exam.get(i),assign.get(i), mini.get(i));
         }
+        
     }
 
     public static void main(String[] args) throws IOException {
